@@ -87,5 +87,5 @@ FOR COMPUTATIONAL MODEL:
 16. train_utils.cpython-39.pyc  
 
 
-The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS and Windows Operating Systems.
+The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS (Ventura and newer versions) and Windows Operating Systems (Windows 7, 10).
 
