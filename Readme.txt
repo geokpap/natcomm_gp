@@ -68,14 +68,23 @@ FOR NEURAL DATA PLOTTING:
 
 
 FOR COMPUTATIONAL MODEL:
-1. logger.py  
-2. models.py  
-3. train.py  
-4. train_utils.py  
-5. environment.py  
-6. analysis.py  
-7. config.py  
-8. config_global.py
+
+1. analysis.py 
+2. config.py
+3. config_global.py 
+4. environment.py
+5. logger.py
+6. models.py 
+7. train.py 
+8. train_utils.py 
+9. analysis.cpython-39.pyc 
+10. config.cpython-39.pyc 
+11. config_global.cpython-39.pyc  
+12. environment.cpython-39.pyc  
+13. logger.cpython-39.pyc 
+14. models.cpython-39.pyc  
+15. train.cpython-39.pyc  
+16. train_utils.cpython-39.pyc  
 
 
 The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS and Windows Operating Systems.
