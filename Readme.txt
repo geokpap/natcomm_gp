@@ -50,7 +50,7 @@ FOR PHYSIOLOGICAL DATA ANALYSIS (pupil diameter):
 
 FOR PHYSIOLOGICAL DATA PLOTTING:
 1. physiological_data.m  
-
+(loads/plots sample_A.mat and sample_B.mat datasets)
 
 FOR NEURAL DATA:
 1. ApAv_GroupSessions_plotWithEventFiles.m  
