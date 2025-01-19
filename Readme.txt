@@ -87,5 +87,4 @@ FOR COMPUTATIONAL MODEL:
 16. train_utils.cpython-39.pyc  
 
 
-The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS (Ventura and newer versions) and Windows Operating Systems (Windows 7, 10).
-
+The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS (Ventura and newer versions) and Windows Operating Systems (Windows 7, 10). Add the MATLAB scripts to your path, load the required data (as specified in the parentheses), and run the scripts. The approximate setup time is 30 minutes.
