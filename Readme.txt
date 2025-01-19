@@ -78,5 +78,5 @@ FOR COMPUTATIONAL MODEL:
 8. config_global.py
 
 
-The MATLAB scripts are compatible with MATLAB R2018a and newer versions.
+The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS and Windows Operating Systems.
 
