@@ -76,3 +76,6 @@ FOR COMPUTATIONAL MODEL:
 6. analysis.py  
 7. config.py  
 8. config_global.py
+
+
+The MATLAB scripts are compatible with MATLAB R2018a and newer versions.
