@@ -49,19 +49,22 @@ FOR PHYSIOLOGICAL DATA ANALYSIS (pupil diameter):
 
 
 FOR PHYSIOLOGICAL DATA PLOTTING:
-1. physiological_data.m  
+1. physiological_data_sim.m  (load sample_A.mat & sample_B.mat)
 
 
 FOR NEURAL DATA:
 1. ApAv_GroupSessions_plotWithEventFiles.m  
 2. combine_variables.m  
-3. data_analysis.m  
-4. ems_segments.m  
-5. ft_getopt.m  
-6. neural_analysis.m  
-7. read_neuralynx_nev.m  
-8. readNexFile.m  
-9. summaryPlotForApAv_EM.m  
+3. ems_segments.m  
+4. ft_getopt.m  
+5. neural_analysis.m  
+6. read_neuralynx_nev.m  
+7. readNexFile.m  
+8. summaryPlotForApAv_EM.m  
+
+
+FOR NEURAL DATA PLOTTING:
+1. data_analysis_sim.m  (load sample_data.mat)
 
 
 FOR COMPUTATIONAL MODEL:
