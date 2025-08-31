@@ -86,5 +86,45 @@ FOR COMPUTATIONAL MODEL:
 15. train.cpython-39.pyc  
 16. train_utils.cpython-39.pyc  
 
+Neural population-level analysis — ENTRY POINTS (run these):
+1. ApAv_GroupSessions_plotWithEventFiles.m
+2. summaryPlotForApAv_EM.m
+3. neural_analysis.m
+4. combine_variables.m
+5. ems_segments.m
+6. ft_getopt.m
+7. read_neuralynx_nev.m
+8. readNexFile.m
+
+Neural population-level analysis — FULL helper list (.m)
+Because there are hundreds of helper utilities (dg_*.m, lfp_*.m, chronux_*.m),
+this TXT ships with a reproducible MATLAB snippet that *appends* the exact list
+from your local population-analysis folder (e.g., 'testfart 3') directly into
+THIS FILE. Run the following once to finalize the inventory:
+
+%% Append full .m inventory for the population-analysis folder into this TXT.
+% Adjust popDir to the folder that contains your dg_*.m / lfp_*.m utilities.
+popDir = fullfile(pwd, 'testfart 3');   % <-- change if your folder is named differently
+txtFile = fullfile(pwd, 'ALL_FILES_inventory.txt');
+
+d = dir(fullfile(popDir, '*.m'));
+names = string({d.name});
+names = names(~endsWith(names,"~"));    % drop backup files like *.m~
+
+fid = fopen(txtFile, 'a');              % append to this same TXT
+fprintf(fid, '\n-- BEGIN AUTO-GENERATED POPULATION .M INVENTORY (%s) --\n', popDir);
+for k = 1:numel(names)
+    fprintf(fid, '    %4d. %s\n', k, names(k));
+end
+fprintf(fid, '-- END AUTO-GENERATED POPULATION .M INVENTORY --\n');
+fclose(fid);
+
+fprintf('Appended %d files to %s\n', numel(names), txtFile);
+
+Notes:
+- Keep NAS/editor cruft out of Git: @eaDir/, *.m~, *.asv, .DS_Store, Thumbs.db
+- Re-run the snippet whenever you add/remove helpers; commit the updated TXT.
+
+
 
 The MATLAB scripts are compatible with MATLAB R2018a and newer versions, for both MacOS (Ventura and newer versions) and Windows Operating Systems (Windows 7, 10). Add the MATLAB scripts to your path, load the required data (as specified in the parentheses), and run the scripts. The approximate setup time is 30 minutes.
