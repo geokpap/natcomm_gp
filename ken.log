@@ -1,0 +1,80 @@
+29-Aug-2025 17:08:29 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:09:46 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:10:22 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:11:07 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:11:07 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:11:08 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:12:18 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:12:18 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:12:18 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:12:45 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:12:46 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:12:46 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:13:19 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:13:19 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:13:20 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:13:55 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:13:55 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:13:56 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:18:01 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:18:01 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:18:02 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:18:31 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:18:32 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:18:32 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:19:09 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:19:09 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:19:10 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:21:23 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:21:23 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:21:23 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:24:21 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:24:21 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:24:21 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:25:04 
+
+		STARTING FROM CLEARED MEMORY
+
+29-Aug-2025 17:25:04 Read events file "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/Events.mat"
+29-Aug-2025 17:25:05 Read CSC filenum 1 "/Users/dgibson/dgmactmp/Debbie/Recordings/ApAvApAp/2019-07-18_10-09-48fixed/csc126clean_down32.mat"
+29-Aug-2025 17:25:05 Applied selection: HasEvent([CROSS_LEFT CROSS_RIGHT]) && HasEvent([airpuffOnAp rewardOnAv])
+29-Aug-2025 17:25:05 Applied selection: HasEvent(FORCED) && HasEvent([AVE_ON_FORCED RWD_ON_FORCED])

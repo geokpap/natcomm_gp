@@ -8,6 +8,7 @@ function [setupstr, sestype] = getGPSessionType(sessiondir)
 % 20240905: changed name of return value to <setupstr> and added return
 %   value <sestype>.  Should be backward-compatible.
 % 20241101: added 'ApAv_rev_only'.
+% 20241220: added 'ApAp_det_rev'.
 
 setupstr = '';
 sessiontypestrings = {
@@ -17,6 +18,7 @@ sessiontypestrings = {
     'ApAvApAp'
     'ApAv_rev_only'
     'ApAv_rev_only_ApAv_2bl'
+    'ApAp_det_rev'
     };
 for typeidx = 1:length(sessiontypestrings)
     sestype = sessiontypestrings{typeidx};

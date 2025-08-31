@@ -27,8 +27,8 @@ function [params, events, badtrials] = lfp_otherPreprocess(events)
 % initial value of <lfp_BadTrials>. The other callers ('lfp_add',
 % 'lfp_fragmentFiles') just raise an error if it is not empty.
 
-%$Rev:  $
-%$Date:  $
+%$Rev: 427 $
+%$Date: 2025-02-07 17:54:49 -0500 (Fri, 07 Feb 2025) $
 %$Author: dgibson $
 
 lfp_declareGlobals;
@@ -574,6 +574,377 @@ switch lfp_SetupType
         events(evts2del, :) = [];
         % That deletion invalidates these indices into <events>:
         clear fixptonidx trialstarts trialends
+    case 'georgios_ApAp_det_rev'
+        % Modified 2024-12-19 from "case {'georgios_ApAv'
+        % 'georgios_ApAvApAp' 'georgios_ApAp'}".
+        if false % should be a test on the session ID for botched session dates
+            % There are six pairs of double-booked event IDs to deal with.
+        else
+            % The session does not have double-booked event IDs, which
+            % makes life simpler.
+            FixPtOnAll = [FixPtOn1 FixPtOn2];
+            fixptonidx = find(ismember(events(:, 2), FixPtOnAll));
+        end        
+        if isempty(fixptonidx)
+            error('lfp_otherPreprocess:fixptonidx2', ...
+                'Session contains no fixptonidx events.');
+        end
+        hasmagnitude = events(fixptonidx(1) - 1, 2) < 200;
+        hastargposn = false;
+        for evtidx = fixptonidx(1) - 2 : -1 : 1
+            if ismember(events(evtidx, 2), [CROSS_LEFT CROSS_RIGHT FORCED])
+                hastargposn = true;
+            end
+        end
+        % Save this result for future reference when editing events:
+        isbadfixpt1 = ~(hasmagnitude && hastargposn);
+        badfixpt1idx = [];
+        if isbadfixpt1
+            % remove trial fragment from <fixptonidx>, and save its index
+            % in the events list so that it can be deleted from <events>
+            % later on:
+            badfixpt1idx = fixptonidx(1);
+            fixptonidx(1) = [];
+        end
+        numtrials = length(fixptonidx);
+        if numtrials ~= 1200
+            warning('lfp_otherPreprocess:numtrials2', ...
+                'Found %d FixPtOn events (usually 1200).', numtrials);
+        end
+        
+        % Extract offer magnitudes.  This must be done based on
+        % <fixptonidx>.  By definition, a well-formed trial must have one
+        % of [CROSS_LEFT CROSS_RIGHT FORCED] as either the second or third
+        % event before FixPtOn, and the one or two events in between
+        % [CROSS_LEFT CROSS_RIGHT FORCED] and FixPtOn must be in the 0-200
+        % range that represents outcome magnitudes.  Any ill-formed trials
+        % are marked as bad and added to <lfp_BadTrials> via <badtrials>,
+        % with NaN outcome magnitudes in <lfp_TrialParams>.  For
+        % well-formed trials, RWD magnitudes go in
+        % <lfp_TrialParams{k}(:,1)> and AVE magnitudes in
+        % <lfp_TrialParams{k}(:,2)>.
+        isgood = ismember( ...
+            events(fixptonidx - 2, 2), [CROSS_LEFT CROSS_RIGHT FORCED] ) ...
+            | ismember( ...
+            events(fixptonidx - 3, 2), [CROSS_LEFT CROSS_RIGHT FORCED] );
+        badtrials = find(~isgood);
+        morebadtrials = [];
+        % At this point, <badtrials> is an index into <fixptonidx>, and is
+        % therefore a suitable value to use to initialize <lfp_BadTrials>
+        % in lfp_read2.  This means we are now committed to keeping every
+        % FixPtOn that currently exists in <events> when we get around to
+        % deleting the outcome magnitude events later on.  We must also
+        % treat <fixptonidx> as immutable until then. Trying to keep track
+        % of all that while still doing the computations in parallel
+        % exceeds my working memory capacity, and there are only O(1000)
+        % trials anyway, so we iterate over trials here.
+        params = NaN(length(fixptonidx), 2);
+        evts2del = zeros(0, 1);
+        for trialnum = 1:length(fixptonidx)
+            if ismember(trialnum, badtrials)
+                % do nothing, <params> is already initialized to NaN.
+            else
+                if events(fixptonidx(trialnum) - 1, 2) < 0 || ...
+                        events(fixptonidx(trialnum) - 1, 2) > 200
+                    % What should be the second outcome magnitude is not
+                    % an outcome magnitude, so this is another bad trial.
+                    morebadtrials(end+1) = trialnum; %#ok<AGROW>
+                else
+                    params(trialnum, 2) = ...
+                        events(fixptonidx(trialnum) - 1, 2);
+                    evts2del(end+1, 1) = fixptonidx(trialnum) - 1; %#ok<AGROW>
+                    if events(fixptonidx(trialnum) - 2, 2) < 0 || ...
+                            events(fixptonidx(trialnum) - 2, 2) > 200
+                        % There is only one outcome magnitude event, so we
+                        % infer the first outcome magnitude was the same as
+                        % the second.
+                        params(trialnum, 1) = params(trialnum, 2);
+                    else
+                        % There were two different outcome magnitude events
+                        params(trialnum, 1) = ...
+                            events(fixptonidx(trialnum) - 2, 2);
+                        evts2del(end+1, 1) = fixptonidx(trialnum) - 2; %#ok<AGROW>
+                    end
+                end
+            end
+        end
+        params = mat2cell(params, ones(length(fixptonidx),1), 2);
+        
+        % Now we delete events (notably the param events) from the events
+        % list. NaNs represent non-magnitude events that were in the
+        % position of the airpuff magnitude.  We also delete the first
+        % <fixptonidx> from <events> if it was a trial fragment.
+        %   NOTE: this deletion invalidates <fixptonidx>, etc.  (It also
+        % might invalidate <numtrials>, but we use that value to determine
+        % whether the number of trials has in fact changed.)
+        evts2del = [badfixpt1idx; evts2del];
+        events(evts2del, :) = [];
+        clear fixptonidx badfixpt1idx hasmagnitude
+        % At this point all events that denote outcome magnitudes have been
+        % moved into <params>.  Cheetah inserts events with zero for TTL at
+        % the very beginning and end of the file, so those can be safely
+        % ignored.  Any others are defects:
+        event0s = find(events(:, 2) == 0);
+        defects = setdiff(event0s, [1 2 size(events, 1)]);
+        if isempty(defects)
+            % All Cheetah, simply delete them:
+            events(event0s, :) = [];
+        else
+            warning('lfp_otherPreprocess:georgios2', ...
+                'Replacing event 0s with event %d.', event_zero);
+            % <event_zero> must be defined by call to lfp_getEvtIDs:
+            events(event0s, 2) = event_zero;
+        end
+        % We can now reliably find MonkeyLogic trial starts and ends:
+        trialstarts = find(events(:, 2) == MLTrialStart);
+        trialends = find(events(:, 2) == MLTrialEnd);
+        % Make sure that recalculating <fixptonidx> doesn't mess up the
+        % trial numbering expressed in <badtrials>.  This functions as an
+        % "assert":
+        if isequal(lfp_SetupType, 'georgios_ApAvApAp')
+            if sum(ismember(events(:, 2), [FixPtOn FixPtOnApAp])) ...
+                    ~= numtrials
+                error('lfp_otherPreprocess:fixptonidx2', ...
+                    'Events editing has altered the number of trials.');
+            else
+                fixptonidx = find(ismember( events(:, 2), ...
+                    [FixPtOn FixPtOnApAp] ));
+            end
+        else
+            if sum(ismember(events(:, 2), FixPtOnAll)) ~= numtrials
+                error('lfp_otherPreprocess:fixptonidx', ...
+                    'Events editing has altered the number of trials.');
+            else
+                fixptonidx = find(ismember(events(:, 2), FixPtOnAll));
+            end
+        end
+        % <trialstarts>, <fixptonidx>, and <trialends> are all indices into
+        % <events>; therefore they should zip nicely to form triples of
+        % [trialstarts, fixptonidx, trialends] with one triple per trial.
+        [~, extratrialstarts, extrafixpts] = dg_zip(trialstarts, fixptonidx);
+        [~, extrafixpts2, extratrialends] = dg_zip(fixptonidx, trialends);
+        % When there is an interruption in recording, we will typically get
+        % a bogus "trial" that consists of the end of one trial and the
+        % beginning of another.  This is easy to detect if it results in
+        % there being no FixPtOn.  If not, see "If there is a recording".
+        trials2del = [];
+        if ~isempty(extratrialstarts) || ~isempty(extratrialends)
+            % This <if> construct must set <evts2del> in all cases.
+            if isequal(extratrialstarts, extratrialends)
+                % Handle the simple case where they are all from trials
+                % that contain no FixPtOn, in which case they will be
+                % equal.
+                trials2del = extratrialstarts;
+                evts2del = [];
+            elseif isempty(extratrialstarts) && isequal(extratrialends, 1)
+                % This could be either a missing trialstart at the
+                % beginning of the session or a trial fragment.  We treat
+                % it as a trial fragment for simplicity, and eliminate by
+                % deleting the extra trial end event.  But we can't just
+                % delete directly from <events> because that will
+                % invalidate <trialstarts> and <trialends>, which we are
+                % still using, so we put it in <evts2del>.
+                evts2del = trialends(1);
+                trialends(extratrialends) = [];
+            elseif ( isempty(extrafixpts) || ...
+                    all(extrafixpts) < length(fixptonidx) ) && ... 
+                    ( isempty(extrafixpts2) || ...
+                    all(extrafixpts2) < length(fixptonidx) ) ... 
+                    && ~isempty(extratrialstarts) && all( ...
+                    trialstarts(extratrialstarts) > fixptonidx(end) ) ...
+                    && ~isempty(extratrialends) && all( ...
+                    trialends(extratrialends) > fixptonidx(end) )
+                % All three of these conditions are met:
+                % 1. There are no extra <fixptonidx> at the end of
+                % <fixptonidx>;
+                % 2. the only extra <trialstarts> are after the last good
+                % triple;
+                % 3. the only extra <trialends> are after the last good
+                % triple;
+                % ...and that implies that there are just some extra ML
+                % events hanging around at the end but the session is
+                % otherwise fine, so the extra events are nothing to worry
+                % about and can simply be deleted.
+                evts2del = [
+                    trialstarts(extratrialstarts)
+                    trialends(extratrialends)
+                    ];
+            else
+                error('lfp_otherPreprocess:extrastartends', ...
+                    'This data error is too complicated to handle.');
+            end
+        else
+            evts2del = [];
+        end
+        for trial2delidx = 1:length(trials2del)
+            evts2del = [evts2del
+                ( trialstarts(trials2del(trial2delidx)) ...
+                : trialends(trials2del(trial2delidx)) )'
+                ]; %#ok<AGROW> 
+        end
+        events(evts2del, :) = [];
+        % That deletion invalidates these indices into <events>:
+        clear fixptonidx trialstarts trialends defects event0s
+        if isequal(lfp_SetupType, 'georgios_ApAvApAp')
+            fixptonidx = find(ismember( events(:, 2), ...
+                [FixPtOn FixPtOnApAp] ));
+        else
+            fixptonidx = find(ismember(events(:, 2), FixPtOnAll));
+        end
+        trialstarts = find(events(:, 2) == MLTrialStart);
+        trialends = find(events(:, 2) == MLTrialEnd);
+        
+        % If there are any missing Monkey Logic trialstarts or trialends,
+        % then additional events must be fabricated to replace the missing
+        % ones.  No attempt is made to replace missing FixPtOns; those
+        % trials simply disappear without a trace.
+        if ~isempty(extrafixpts) || ~isempty(extrafixpts2)
+            warning('lfp_otherPreprocess:missing', ...
+                'Missing required events; repairing.');
+            newstartTS = zeros(0,1);
+            newendTS = zeros(0,1);
+            if ~isempty(extrafixpts)
+                for extrafixidx = 1:length(extrafixpts)
+                    % There is a trial start missing before each
+                    % <extrafixpts>. If there is an IEI > 8 s within 5
+                    % events of the "extra" FixPtOn, then insert the
+                    % trial start at its end. Otherwise, simply start the
+                    % trial right before the "extra" FixPtOn.
+                    for evtidx = fixptonidx(extrafixpts(extrafixidx))
+                        % <lookback> is needed to handle events that are
+                        % within <5 events of the first event in the file:
+                        lookback = min(evtidx - 1, 5);
+                        IEIs = diff(events(evtidx + (-lookback:0), 1));
+                        longidx = find(IEIs > 8, 1, 'last');
+                        if isempty(longidx)
+                            newstartTS(end+1, 1) = ...
+                                events(evtidx, 1) - 10; %#ok<AGROW>
+                        else
+                            newstartTS(end+1, 1) = ...
+                                events(evtidx - lookback + longidx - 1, 1) - 10; %#ok<AGROW>
+                        end
+                    end
+                end
+                warning('lfp_otherPreprocess:newstarts', ...
+                    'Inserting remedial trial start(s) for trial(s) %s at %s', ...
+                    dg_thing2str(extrafixpts), ...
+                    dg_thing2str(newstartTS/1e6));
+            end
+            if ~isempty(extrafixpts2)
+                for extrafixidx = 1:length(extrafixpts2)
+                    % There is a trial end missing after each
+                    % <extrafixpts2>. If there is an IEI > 8 s within 8
+                    % events of the "extra" FixPtOn, then insert the the
+                    % trial end at its beginning. Otherwise, simply
+                    % terminate the trial right after the "extra" FixPtOn.
+                    for evtidx = fixptonidx(extrafixpts2(extrafixidx))
+                        IEIs = diff(events( evtidx + ...
+                            (0 : min(size(events,1) - evtidx, 8)), 1 ));
+                        longidx = find(IEIs > 8, 1);
+                        if isempty(longidx)
+                            newendTS(end+1, 1) = events(evtidx, 1) + 10;  %#ok<AGROW>
+                        else
+                            newendTS(end+1, 1) = ...
+                                events(evtidx + longidx - 1, 1) + 10;  %#ok<AGROW>
+                        end
+                    end
+                end
+                warning('lfp_otherPreprocess:newstarts2', ...
+                    'Inserting remedial trial end(s) for trial(s) %s at %s', ...
+                    dg_thing2str(extrafixpts2), ...
+                    dg_thing2str(newendTS/1e6));
+            end
+            events = sortrows([ events
+                newstartTS repmat(MLTrialStart, size(newstartTS))
+                newendTS repmat(MLTrialEnd, size(newendTS)) ]);
+            trialstarts = find(events(:, 2) == MLTrialStart);
+            trialends = find(events(:, 2) == MLTrialEnd);
+        end
+        % If there are any missing Monkey Logic trialstarts or trialends,
+        % then additional events must be fabricated to replace the missing
+        % ones.  No attempt is made to replace missing FixPtOns; those
+        % trials simply disappear without a trace.
+        if ~isempty(extrafixpts) || ~isempty(extrafixpts2)
+            warning('lfp_otherPreprocess:missing', ...
+                'Missing required events; repairing.');
+            newstartTS = zeros(0,1);
+            newendTS = zeros(0,1);
+            if ~isempty(extrafixpts)
+                for extrafixidx = 1:length(extrafixpts)
+                    % There is a trial start missing before each
+                    % <extrafixpts>. If there is an IEI > 8 s within 5
+                    % events of the "extra" FixPtOn, then insert the
+                    % trial start at its end. Otherwise, simply start the
+                    % trial right before the "extra" FixPtOn.
+                    for evtidx = fixptonidx(extrafixpts(extrafixidx))
+                        % <lookback> is needed to handle events that are
+                        % within <5 events of the first event in the file:
+                        lookback = min(evtidx - 1, 5);
+                        IEIs = diff(events(evtidx + (-lookback:0), 1));
+                        longidx = find(IEIs > 8, 1, 'last');
+                        if isempty(longidx)
+                            newstartTS(end+1, 1) = ...
+                                events(evtidx, 1) - 10; %#ok<AGROW>
+                        else
+                            newstartTS(end+1, 1) = ...
+                                events(evtidx - lookback + longidx - 1, 1) - 10; %#ok<AGROW>
+                        end
+                    end
+                end
+                warning('lfp_otherPreprocess:newstarts', ...
+                    'Inserting remedial trial start(s) for trial(s) %s at %s', ...
+                    dg_thing2str(extrafixpts), ...
+                    dg_thing2str(newstartTS/1e6));
+            end
+            if ~isempty(extrafixpts2)
+                for extrafixidx = 1:length(extrafixpts2)
+                    % There is a trial end missing after each
+                    % <extrafixpts2>. If there is an IEI > 8 s within 8
+                    % events of the "extra" FixPtOn, then insert the the
+                    % trial end at its beginning. Otherwise, simply
+                    % terminate the trial right after the "extra" FixPtOn.
+                    for evtidx = fixptonidx(extrafixpts2(extrafixidx))
+                        IEIs = diff(events( evtidx + ...
+                            (0 : min(size(events,1) - evtidx, 8)), 1 ));
+                        longidx = find(IEIs > 8, 1);
+                        if isempty(longidx)
+                            newendTS(end+1, 1) = events(evtidx, 1) + 10;  %#ok<AGROW>
+                        else
+                            newendTS(end+1, 1) = ...
+                                events(evtidx + longidx - 1, 1) + 10;  %#ok<AGROW>
+                        end
+                    end
+                end
+                warning('lfp_otherPreprocess:newstarts2', ...
+                    'Inserting remedial trial end(s) for trial(s) %s at %s', ...
+                    dg_thing2str(extrafixpts2), ...
+                    dg_thing2str(newendTS/1e6));
+            end
+            events = sortrows([ events
+                newstartTS repmat(MLTrialStart, size(newstartTS))
+                newendTS repmat(MLTrialEnd, size(newendTS)) ]);
+            trialstarts = find(events(:, 2) == MLTrialStart);
+            trialends = find(events(:, 2) == MLTrialEnd);
+        end
+        % If there is a recording gap that occurs after FixPtOn, the only
+        % way to know is by virtue of a ridiculously long trial.  If there
+        % is no recording gap, the longest a trial can be is about 60
+        % seconds from FixPtOn, which would be about 65 s including the
+        % "baseline" period.  So here we check for both missing FixPtOn's
+        % AND for trials that are longer than 90 s, and simply remove all
+        % the events from MLTrialStart to MLTrialEnd.
+        trialdurs = events(trialends, 1) - events(trialstarts, 1);
+        trials2del = find(trialdurs > 90e6);
+        evts2del = [];
+        for trial2delidx = 1:length(trials2del)
+            evts2del = [evts2del
+                (trialstarts(trial2delidx) : trialends(trial2delidx))'
+                ]; %#ok<AGROW> 
+        end
+        events(evts2del, :) = [];
+        % That deletion invalidates these indices into <events>:
+        clear fixptonidx trialstarts trialends
+        
     otherwise 
         error('lfp_otherPreprocess:setup', 'Unknown value for lfp_SetupType: %s', lfp_SetupType);
 end

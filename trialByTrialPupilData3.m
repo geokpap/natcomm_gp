@@ -24,9 +24,9 @@ function trialByTrialPupilData3(sessiondir)
 % code to skip any ApAv (or ApAv_em) sessions that already have a
 % "trialByTrialPupilData.mat" file.  Modified code to raise a warning and
 % replace the output file for other session types.
-%   Sep 6-8 2024: assorted tweaks.
+%   Sep 6-8 2024: a sordid tweaks to all kinesashit.
 
-global lfp_Samples lfp_Events lfp_TrialIndex lfp_TrialParams %#ok<GVMIS>
+global lfp_Samples lfp_Events lfp_TrialIndex lfp_TrialParams 
 
 outroot = '/annex2/analysis/dgibson/pupilApAv_rev_only'; % as in 'cleanEyeLinkSession'
 altroots = {
@@ -210,8 +210,8 @@ for tnum = lfp_enabledTrials
         error('trialByTrialPupilData3:parms', ...
             'Invalid param pair for forced trial, trialnum %d.', tnum);
     end
-    avgdiam = nanmean(lfp_Samples{1}(cuesamp:outcomesamp)); %#ok<NANMEAN>
-    meddiam = nanmedian(lfp_Samples{1}(cuesamp:outcomesamp)); %#ok<NANMEDIAN>
+    avgdiam = nanmean(lfp_Samples{1}(cuesamp:outcomesamp)); 
+    meddiam = nanmedian(lfp_Samples{1}(cuesamp:outcomesamp)); 
     trialTS = lfp_Events(lfp_TrialIndex(tnum, 1), 1);
     forceddata(rownum, :) = [mag, isrwd, avgdiam, meddiam, trialTS];
     rownum = rownum + 1;

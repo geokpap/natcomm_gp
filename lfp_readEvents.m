@@ -29,8 +29,8 @@ function [params, events, fnameEV, badtrials] = lfp_readEvents(read_mode, ...
 % a problematic event code for Matlab purposes anyway.  When <usestrobe> is
 % false, events with zero TTL value are removed silently.
 
-%$Rev: 422 $
-%$Date: 2023-09-08 14:25:38 -0400 (Fri, 08 Sep 2023) $
+%$Rev: 427 $
+%$Date: 2025-02-07 17:54:49 -0500 (Fri, 07 Feb 2025) $
 %$Author: dgibson $
 
 lfp_declareGlobals;
@@ -300,7 +300,8 @@ if ~strcmp(ev_read_mode, 'evtsav') || alwaysuseVTflag
         case {'monkey' 'theresa' 'naotaka'}
             [params, events] = lfp_monkeyPreprocess(events);
         case {'ken' 'georgios_ApAv' 'georgios_ApAvApAp' ...
-                'georgios_ApAp' 'georgios_ApAv_rev_only'}
+                'georgios_ApAp' 'georgios_ApAv_rev_only' ...
+                'georgios_ApAp_det_rev'}
             [params, events, badtrials] = lfp_otherPreprocess(events);
         case 'wheel'
             events = lfp_wheelPreprocess(events);
